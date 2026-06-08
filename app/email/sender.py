@@ -51,6 +51,9 @@ class ResendSender(BaseSender):
             headers={
                 "Authorization": f"Bearer {self.api_key}",
                 "Content-Type": "application/json",
+                # urllib's default User-Agent gets blocked by Resend's Cloudflare
+                # bot filter (HTTP 403, error 1010). Identify as a normal client.
+                "User-Agent": "Mozilla/5.0 (compatible; LagniappeCRM/1.0; +https://newestcrm.vercel.app)",
             },
             method="POST",
         )
