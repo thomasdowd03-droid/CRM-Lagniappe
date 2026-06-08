@@ -62,6 +62,7 @@
               {% if m.status == 'sent' %}bg-emerald-50 text-emerald-700
               {% elif m.status == 'failed' %}bg-red-50 text-red-700
               {% else %}bg-slate-100 text-slate-600{% endif %}">{{ m.status }}</span>
+            {% if m.error %}<div class="text-xs text-red-600 mt-1 max-w-md break-words">{{ m.error }}</div>{% endif %}
           </td>
           <td class="px-5 py-3 text-slate-600">{% if m.opened %}✓ <span class="text-xs text-slate-400">{{ m.open_count }}×</span>{% else %}—{% endif %}</td>
           <td class="px-5 py-3 text-slate-600">{% if m.clicked %}✓ <span class="text-xs text-slate-400">{{ m.click_count }}×</span>{% else %}—{% endif %}</td>

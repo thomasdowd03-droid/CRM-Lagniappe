@@ -5,6 +5,7 @@ no-delivery Outbox sender otherwise. Adding another provider later (Postmark, SE
 means writing one more class here — nothing else in the app changes.
 """
 import json
+import urllib.error
 import urllib.request
 
 from .. import config
@@ -53,8 +54,12 @@ class ResendSender(BaseSender):
             },
             method="POST",
         )
-        with urllib.request.urlopen(request, timeout=20) as resp:
-            data = json.loads(resp.read().decode())
+        try:
+            with urllib.request.urlopen(request, timeout=20) as resp:
+                data = json.loads(resp.read().decode())
+        except urllib.error.HTTPError as exc:
+            detail = exc.read().decode("utf-8", "replace")
+            raise RuntimeError(f"Resend API {exc.code}: {detail[:300]}") from exc
         return {"ok": True, "provider": "resend", "id": data.get("id")}
 
 
