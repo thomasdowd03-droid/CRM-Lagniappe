@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}New campaign · Lagniappe CRM{% endblock %}
+{% block heading %}New campaign{% endblock %}
+{% block content %}
+  <a href="{{ url_for('campaigns.list_campaigns') }}" class="text-sm text-brand hover:underline">← All campaigns</a>
+
+  {% if sender_mode == 'outbox' %}
+  <div class="mt-4 max-w-2xl rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3">
+    <strong>Test mode.</strong> No email service is connected yet, so sends are <em>recorded but not delivered</em>.
+  </div>
+  {% else %}
+  <div class="mt-4 max-w-2xl rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm px-4 py-3">
+    <strong>Live mode.</strong> Emails will be delivered via your connected email service.
+  </div>
+  {% endif %}
+
+  <link href="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.snow.css" rel="stylesheet">
+  <style>
+    #editor .ql-editor { min-height: 220px; font-size: 14px; }
+    #editor .ql-container { border-bottom-left-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
+    .ql-toolbar { border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem; }
+  </style>
+
+  <form method="post" class="mt-6 max-w-2xl space-y-5">
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Campaign name</label>
+      <input name="name" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+             placeholder="Spring distributor outreach">
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">From name</label>
+        <input name="from_name" value="{{ config.FROM_NAME }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">From email</label>
+        <input name="from_email" value="{{ config.FROM_EMAIL }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Subject</label>
+      <input name="subject" required class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+             placeholder="A value-added seafood partner in NJ">
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Message</label>
+      <div id="editor"></div>
+      <input type="hidden" name="body" id="bodyField">
+      <p class="text-xs text-slate-400 mt-1">Write it like a normal email — <strong>bold</strong>, links, and lists all work. A mailing-address + unsubscribe footer and open/click tracking are added automatically.</p>
+    </div>
+
+    <div class="rounded-lg border border-slate-200 p-4 space-y-3">
+      <label class="flex items-center gap-2 text-sm text-slate-700">
+        <input type="checkbox" name="include_contacts" class="rounded border-slate-300">
+        Include all contacts that have an email address
+      </label>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Test recipients</label>
+        <textarea name="test_recipients" rows="2" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
+                  placeholder="you@example.com, colleague@example.com"></textarea>
+        <p class="text-xs text-slate-400 mt-1">Comma-separated. Add your own email to preview a send to yourself.</p>
+      </div>
+    </div>
+
+    <button type="submit" class="px-5 py-2.5 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark">Create campaign →</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/quill@2/dist/quill.js"></script>
+  <script>
+    const quill = new Quill('#editor', {
+      theme: 'snow',
+      placeholder: 'Write your message…',
+      modules: { toolbar: [['bold', 'italic', 'underline'], [{ list: 'ordered' }, { list: 'bullet' }], ['link'], ['clean']] }
+    });
+    quill.clipboard.dangerouslyPasteHTML({{ starter_body|tojson }});
+    document.querySelector('form').addEventListener('submit', function () {
+      document.getElementById('bodyField').value = quill.root.innerHTML;
+    });
+  </script>
+{% endblock %}

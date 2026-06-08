@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ company.name }} · Lagniappe CRM{% endblock %}
+{% block heading %}{{ company.name }}{% endblock %}
+{% block content %}
+  <div class="flex items-center justify-between">
+    <a href="{{ url_for('companies.list_companies') }}" class="text-sm text-brand hover:underline">← All companies</a>
+    <div class="flex items-center gap-4">
+      <a href="{{ url_for('companies.edit_company', company_id=company.id) }}" class="text-sm text-brand hover:underline">Edit</a>
+      <form method="post" action="{{ url_for('companies.delete_company', company_id=company.id) }}"
+            onsubmit="return confirm('Delete {{ company.name }} and all its contacts? This cannot be undone.');">
+        <button type="submit" class="text-sm text-red-600 hover:underline">Delete</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-4">
+    <div class="lg:col-span-2 space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-start gap-4">
+          <span class="w-14 h-14 rounded-xl bg-brand-light text-brand-dark flex items-center justify-center text-xl font-semibold">{{ company.initial }}</span>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-center gap-2 flex-wrap">
+              <h2 class="text-lg font-semibold text-slate-800">{{ company.name }}</h2>
+              {% if company.category %}<span class="px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600">{{ company.category }}</span>{% endif %}
+            </div>
+            {% if company.website %}
+              <a href="https://{{ company.website }}" target="_blank" rel="noopener noreferrer"
+                 class="text-sm text-brand hover:underline">{{ company.website }} ↗</a>
+            {% endif %}
+            <div class="text-sm text-slate-500 mt-1">{{ company.location or '—' }}</div>
+          </div>
+        </div>
+        {% if company.description %}
+          <p class="text-sm text-slate-600 leading-relaxed mt-4">{{ company.description }}</p>
+        {% endif %}
+      </div>
+
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <div class="flex items-center justify-between mb-3">
+          <h3 class="font-medium text-slate-700">Contacts</h3>
+          <a href="{{ url_for('contacts.new_contact', company_id=company.id) }}" class="text-sm text-brand hover:underline">+ Add contact</a>
+        </div>
+        {% if company.contacts %}
+          <div class="divide-y divide-slate-100">
+            {% for p in company.contacts %}
+              <div class="py-2 flex items-center gap-3">
+                <div class="flex-1">
+                  <a href="{{ url_for('contacts.edit_contact', contact_id=p.id) }}" class="text-sm font-medium text-slate-800 hover:text-brand hover:underline">{{ p.display_name }}</a>
+                  <div class="text-xs text-slate-500">{{ p.title or '—' }}</div>
+                </div>
+                <div class="text-sm text-slate-500">{{ p.email or '—' }}</div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="text-sm text-slate-400">No contacts yet — we'll add decision-makers and their verified emails here when we enrich this prospect (Phase 2).</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="space-y-6">
+      <div class="bg-white rounded-xl border border-slate-200 p-6">
+        <h3 class="font-medium text-slate-700 mb-4">Details</h3>
+        <dl class="space-y-3 text-sm">
+          {% set rows = [
+            ('Status', company.status|capitalize),
+            ('Employees', company.employee_range),
+            ('Revenue', company.revenue_range),
+            ('Industry', company.naics_description),
+            ('NAICS', company.naics_code),
+            ('Source', company.source|capitalize)
+          ] %}
+          {% for label, value in rows %}
+            <div class="flex justify-between gap-4">
+              <dt class="text-slate-400">{{ label }}</dt>
+              <dd class="text-slate-700 text-right">{{ value or '—' }}</dd>
+            </div>
+          {% endfor %}
+        </dl>
+      </div>
+    </div>
+  </div>
+{% endblock %}

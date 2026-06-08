@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unsubscribed</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50">
+  <div class="max-w-md mx-auto mt-24 bg-white rounded-xl border border-slate-200 p-8 text-center">
+    <div class="text-4xl mb-3">✅</div>
+    <h1 class="text-lg font-semibold text-slate-800">You've been unsubscribed</h1>
+    <p class="text-sm text-slate-500 mt-2">
+      {% if email %}<strong>{{ email }}</strong> has been removed. {% endif %}
+      You won't receive further emails from Lagniappe Foods.
+    </p>
+  </div>
+</body>
+</html>

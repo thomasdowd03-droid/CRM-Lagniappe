@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Edit contact · Lagniappe CRM{% endblock %}
+{% block heading %}Edit {{ contact.display_name }}{% endblock %}
+{% block content %}
+  <a href="{{ url_for('contacts.list_contacts') }}" class="text-sm text-brand hover:underline">← All contacts</a>
+
+  <form method="post" class="mt-6 max-w-2xl space-y-5">
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">First name</label>
+        <input name="first_name" value="{{ contact.first_name or '' }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Last name</label>
+        <input name="last_name" value="{{ contact.last_name or '' }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">Title</label>
+      <input name="title" value="{{ contact.title or '' }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+        <input name="email" type="email" value="{{ contact.email or '' }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+        <input name="phone" value="{{ contact.phone or '' }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+      </div>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-slate-700 mb-1">LinkedIn</label>
+      <input name="linkedin" value="{{ contact.linkedin or '' }}" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm">
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Company</label>
+        <select name="company_id" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white">
+          <option value="">— None —</option>
+          {% for co in companies %}
+            <option value="{{ co.id }}" {% if contact.company_id == co.id %}selected{% endif %}>{{ co.name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">Status</label>
+        <select name="status" class="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm bg-white">
+          {% for opt in ['lead', 'prospect', 'customer', 'archived'] %}
+            <option value="{{ opt }}" {% if contact.status == opt %}selected{% endif %}>{{ opt|capitalize }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <button type="submit" class="px-5 py-2.5 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark">Update contact</button>
+  </form>
+
+  <form method="post" action="{{ url_for('contacts.delete_contact', contact_id=contact.id) }}"
+        class="max-w-2xl mt-4 pt-4 border-t border-slate-200"
+        onsubmit="return confirm('Delete {{ contact.display_name }}? This cannot be undone.');">
+    <button type="submit" class="text-sm text-red-600 hover:underline">Delete this contact</button>
+  </form>
+{% endblock %}

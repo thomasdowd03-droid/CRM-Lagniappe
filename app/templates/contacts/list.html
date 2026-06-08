@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Contacts · Lagniappe CRM{% endblock %}
+{% block heading %}Contacts{% endblock %}
+{% block content %}
+  <div class="flex justify-end gap-2 mb-4">
+    <a href="{{ url_for('contacts.import_contacts') }}"
+       class="px-4 py-2 rounded-lg border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">↑ Import CSV</a>
+    <a href="{{ url_for('contacts.new_contact') }}"
+       class="px-4 py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark">+ Add contact</a>
+  </div>
+
+  {% if contacts %}
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+          <th class="px-5 py-3 font-medium">Name</th>
+          <th class="px-5 py-3 font-medium">Title</th>
+          <th class="px-5 py-3 font-medium">Company</th>
+          <th class="px-5 py-3 font-medium">Email</th>
+          <th class="px-5 py-3 font-medium">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for p in contacts %}
+        <tr class="hover:bg-slate-50">
+          <td class="px-5 py-3">
+            <a href="{{ url_for('contacts.edit_contact', contact_id=p.id) }}" class="font-medium text-slate-800 hover:text-brand hover:underline">{{ p.display_name }}</a>
+          </td>
+          <td class="px-5 py-3 text-slate-600">{{ p.title or '—' }}</td>
+          <td class="px-5 py-3 text-slate-600">{{ p.company.name if p.company else '—' }}</td>
+          <td class="px-5 py-3 text-slate-600">{{ p.email or '—' }}</td>
+          <td class="px-5 py-3">
+            <span class="inline-block px-2 py-0.5 rounded-full text-xs capitalize
+              {% if p.status == 'customer' %}bg-emerald-50 text-emerald-700
+              {% elif p.status == 'prospect' %}bg-brand-light text-brand-dark
+              {% elif p.status == 'archived' %}bg-slate-100 text-slate-500
+              {% else %}bg-amber-50 text-amber-700{% endif %}">{{ p.status }}</span>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="bg-white rounded-xl border border-slate-200 p-10 text-center">
+    <div class="text-4xl mb-3">👤</div>
+    <h3 class="font-medium text-slate-700">No contacts yet</h3>
+    <p class="text-sm text-slate-400 mt-1 max-w-md mx-auto">
+      Add your existing customers and leads by hand — each with their real email — and they're
+      ready to drop into an email blast. (We can also pull contacts from the data tool later.)
+    </p>
+    <a href="{{ url_for('contacts.new_contact') }}"
+       class="inline-block mt-4 px-4 py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark">+ Add your first contact</a>
+  </div>
+  {% endif %}
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Companies · Lagniappe CRM{% endblock %}
+{% block heading %}Companies{% endblock %}
+{% block content %}
+  <div class="flex justify-end mb-4">
+    <a href="{{ url_for('companies.new_company') }}"
+       class="px-4 py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark">+ Add company</a>
+  </div>
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+          <th class="px-5 py-3 font-medium">Company</th>
+          <th class="px-5 py-3 font-medium">Location</th>
+          <th class="px-5 py-3 font-medium">Size</th>
+          <th class="px-5 py-3 font-medium">Category</th>
+          <th class="px-5 py-3 font-medium">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for c in companies %}
+        <tr class="hover:bg-slate-50 cursor-pointer"
+            onclick="window.location='{{ url_for('companies.company_detail', company_id=c.id) }}'">
+          <td class="px-5 py-3">
+            <div class="flex items-center gap-3">
+              <span class="w-8 h-8 rounded-lg bg-brand-light text-brand-dark flex items-center justify-center text-sm font-semibold">{{ c.initial }}</span>
+              <div>
+                <div class="font-medium text-slate-800">{{ c.name }}</div>
+                <div class="text-xs text-slate-400">{{ c.domain }}</div>
+              </div>
+            </div>
+          </td>
+          <td class="px-5 py-3 text-slate-600">{{ c.location or '—' }}</td>
+          <td class="px-5 py-3 text-slate-600">
+            {{ c.employee_range or '—' }}{% if c.revenue_range %} · {{ c.revenue_range }}{% endif %}
+          </td>
+          <td class="px-5 py-3">
+            {% if c.category %}<span class="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600">{{ c.category }}</span>{% endif %}
+          </td>
+          <td class="px-5 py-3">
+            <span class="inline-block px-2 py-0.5 rounded-full text-xs bg-amber-50 text-amber-700 capitalize">{{ c.status }}</span>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5" class="px-5 py-8 text-center text-slate-400">No companies yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="text-xs text-slate-400 mt-3">{{ companies|length }} compan{{ 'y' if companies|length == 1 else 'ies' }}</p>
+{% endblock %}

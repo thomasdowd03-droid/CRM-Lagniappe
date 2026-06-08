@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}{{ campaign.name }} · Lagniappe CRM{% endblock %}
+{% block heading %}{{ campaign.name }}{% endblock %}
+{% block content %}
+  <a href="{{ url_for('campaigns.list_campaigns') }}" class="text-sm text-brand hover:underline">← All campaigns</a>
+
+  <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <div class="text-xs text-slate-500">Recipients</div>
+      <div class="text-2xl font-semibold text-slate-800">{{ campaign.recipient_count }}</div>
+    </div>
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <div class="text-xs text-slate-500">Sent</div>
+      <div class="text-2xl font-semibold text-slate-800">{{ campaign.sent_count }}</div>
+    </div>
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <div class="text-xs text-slate-500">Opens</div>
+      <div class="text-2xl font-semibold text-brand">{{ campaign.opened_count }} <span class="text-sm text-slate-400">{{ campaign.open_rate }}%</span></div>
+    </div>
+    <div class="bg-white rounded-xl border border-slate-200 p-4">
+      <div class="text-xs text-slate-500">Clicks</div>
+      <div class="text-2xl font-semibold text-brand">{{ campaign.clicked_count }} <span class="text-sm text-slate-400">{{ campaign.click_rate }}%</span></div>
+    </div>
+  </div>
+
+  <div class="mt-4 bg-white rounded-xl border border-slate-200 p-5">
+    <div class="flex items-center justify-between flex-wrap gap-3">
+      <div class="text-sm text-slate-600">
+        <span class="text-slate-400">Subject:</span> {{ campaign.subject or '—' }}<br>
+        <span class="text-slate-400">From:</span> {{ campaign.from_name }} &lt;{{ campaign.from_email }}&gt;
+      </div>
+      <form method="post" action="{{ url_for('campaigns.send_campaign', campaign_id=campaign.id) }}"
+            onsubmit="return confirm('Send to {{ campaign.recipient_count }} recipient(s)?{% if sender_mode != 'outbox' %} This delivers real emails.{% endif %}');">
+        <button type="submit" class="px-4 py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark">
+          {% if campaign.status == 'sent' %}Re-send queued{% else %}Send now{% endif %}
+        </button>
+      </form>
+    </div>
+    {% if sender_mode == 'outbox' %}
+    <p class="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded px-3 py-2 mt-3">
+      Test mode — sends are recorded but not actually delivered. Open/click tracking still works.
+    </p>
+    {% endif %}
+  </div>
+
+  <div class="mt-4 bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+          <th class="px-5 py-3 font-medium">Recipient</th>
+          <th class="px-5 py-3 font-medium">Status</th>
+          <th class="px-5 py-3 font-medium">Opened</th>
+          <th class="px-5 py-3 font-medium">Clicked</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for m in campaign.messages %}
+        <tr>
+          <td class="px-5 py-3 text-slate-700">{{ m.to_email }}</td>
+          <td class="px-5 py-3">
+            <span class="inline-block px-2 py-0.5 rounded-full text-xs capitalize
+              {% if m.status == 'sent' %}bg-emerald-50 text-emerald-700
+              {% elif m.status == 'failed' %}bg-red-50 text-red-700
+              {% else %}bg-slate-100 text-slate-600{% endif %}">{{ m.status }}</span>
+          </td>
+          <td class="px-5 py-3 text-slate-600">{% if m.opened %}✓ <span class="text-xs text-slate-400">{{ m.open_count }}×</span>{% else %}—{% endif %}</td>
+          <td class="px-5 py-3 text-slate-600">{% if m.clicked %}✓ <span class="text-xs text-slate-400">{{ m.click_count }}×</span>{% else %}—{% endif %}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="px-5 py-8 text-center text-slate-400">No recipients.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

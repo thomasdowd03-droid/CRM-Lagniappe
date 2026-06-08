@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Campaigns · Lagniappe CRM{% endblock %}
+{% block heading %}Campaigns{% endblock %}
+{% block content %}
+  <div class="flex justify-end mb-4">
+    <a href="{{ url_for('campaigns.new_campaign') }}"
+       class="px-4 py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark">+ New campaign</a>
+  </div>
+
+  {% if campaigns %}
+  <div class="bg-white rounded-xl border border-slate-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-slate-50 text-slate-500 text-left">
+        <tr>
+          <th class="px-5 py-3 font-medium">Campaign</th>
+          <th class="px-5 py-3 font-medium">Status</th>
+          <th class="px-5 py-3 font-medium">Recipients</th>
+          <th class="px-5 py-3 font-medium">Opens</th>
+          <th class="px-5 py-3 font-medium">Clicks</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for c in campaigns %}
+        <tr class="hover:bg-slate-50 cursor-pointer"
+            onclick="window.location='{{ url_for('campaigns.campaign_detail', campaign_id=c.id) }}'">
+          <td class="px-5 py-3">
+            <div class="font-medium text-slate-800">{{ c.name }}</div>
+            <div class="text-xs text-slate-400">{{ c.subject or 'No subject' }}</div>
+          </td>
+          <td class="px-5 py-3"><span class="inline-block px-2 py-0.5 rounded-full text-xs bg-slate-100 text-slate-600 capitalize">{{ c.status }}</span></td>
+          <td class="px-5 py-3 text-slate-600">{{ c.recipient_count }}</td>
+          <td class="px-5 py-3 text-slate-600">{{ c.opened_count }}{% if c.sent_count %} · {{ c.open_rate }}%{% endif %}</td>
+          <td class="px-5 py-3 text-slate-600">{{ c.clicked_count }}{% if c.sent_count %} · {{ c.click_rate }}%{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="bg-white rounded-xl border border-slate-200 p-10 text-center">
+    <div class="text-4xl mb-3">✉️</div>
+    <h3 class="font-medium text-slate-700">No campaigns yet</h3>
+    <p class="text-sm text-slate-400 mt-1">Create your first email blast and track who opens and clicks.</p>
+    <a href="{{ url_for('campaigns.new_campaign') }}"
+       class="inline-block mt-4 px-4 py-2 rounded-lg bg-brand text-white text-sm font-medium hover:bg-brand-dark">+ New campaign</a>
+  </div>
+  {% endif %}
+{% endblock %}
